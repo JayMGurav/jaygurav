@@ -26,7 +26,7 @@ const years = Object.keys(articles).sort((a, b) => parseInt(b) - parseInt(a));
 ---
 
 <Layout title={ARTICLES.TITLE} description={ARTICLES.DESCRIPTION}>
-  <Container>
+  <Container backLink="/" backLinkText="Back to Index">
     <aside data-pagefind-ignore>
       <div class="space-y-10">
         <div class="space-y-4">

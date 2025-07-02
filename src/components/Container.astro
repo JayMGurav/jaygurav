@@ -1,5 +1,21 @@
 ---
+import BackToPrevious from "@components/BackToPrevious.astro";
 
+type Props = {
+    backLink?: string;
+    backLinkText?: string;
+};
+
+const { backLink, backLinkText } = Astro.props;
 ---
 
-<div class="mx-auto max-w-(--breakpoint-sm) px-3"><slot /></div>
+<div class="mx-auto max-w-(--breakpoint-sm) px-3">
+    {
+        backLink && (
+            <div class="animate my-4" data-pagefind-ignore>
+                <BackToPrevious href={backLink}>{backLinkText}</BackToPrevious>
+            </div>
+        )
+    }
+    <slot />
+</div>

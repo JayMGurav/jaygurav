@@ -8,6 +8,7 @@ import { getCollection } from "astro:content";
 import Image from "astro/components/Image.astro";
 import partyPopper from "@assets/partyPopper.avif";
 import { cn } from "@lib/utils";
+import Nav from "@components/Nav.astro";
 
 const articles = (await getCollection("articles"))
   .filter((post) => !post.data.draft)
@@ -41,6 +42,7 @@ const featuredArticles = articles.slice(0, 3);
               </p>
             </span>
           </article>
+          <Nav />
         </section>
 
         <section class="animate space-y-6">
