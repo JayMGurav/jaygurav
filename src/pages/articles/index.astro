@@ -4,13 +4,21 @@ import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import { ARTICLES } from "@consts";
+import { format } from "date-fns";
+import { cn } from "@lib/utils";
 
 const data = (await getCollection("articles"))
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 type Acc = {
-  [year: string]: CollectionEntry<"articles">[];
+  [year: string]: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    year: number;
+    date: Date;
+  }>;
 };
 
 const articles = data.reduce((acc: Acc, article) => {
@@ -18,7 +26,13 @@ const articles = data.reduce((acc: Acc, article) => {
   if (!acc[year]) {
     acc[year] = [];
   }
-  acc[year].push(article);
+  acc[year].push({
+    id: article.id,
+    slug: `/articles/${article.id}`,
+    title: article.data.title,
+    year: new Date(article.data.date).getFullYear(),
+    date: article.data.date,
+  });
   return acc;
 }, {});
 
@@ -27,27 +41,44 @@ const years = Object.keys(articles).sort((a, b) => parseInt(b) - parseInt(a));
 
 <Layout title={ARTICLES.TITLE} description={ARTICLES.DESCRIPTION}>
   <Container backLink="/" backLinkText="Back to Index">
-    <aside data-pagefind-ignore>
-      <div class="space-y-10">
-        <div class="space-y-4">
-          {
-            years.map((year) => (
-              <section class="animate space-y-4">
-                <div class="font-semibold">{year}</div>
-                <div>
-                  <ul class="not-prose flex flex-col gap-4">
-                    {articles[year].map((article) => (
-                      <li>
-                        <ArrowCard entry={article} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </section>
-            ))
-          }
-        </div>
-      </div>
+    <aside data-pagefind-ignore class="my-10">
+      {
+        years?.map((year) => (
+          <div class="animate mb-8 md:grid md:grid-cols-6 md:gap-2">
+            <div class="relative hidden h-full md:block">
+              <span class="text-muted-foreground sticky top-10">{year}</span>
+            </div>
+            <div class="on col-span-5 h-full">
+              {articles?.[year]?.map(
+                ({ slug, year, date, title }, index: number) => (
+                  <>
+                    {index == 0 && (
+                      <span class="text-muted-foreground md:hidden">
+                        {year}
+                      </span>
+                    )}
+                    <a href={slug}>
+                      <div
+                        class={cn(
+                          "hover:text-foreground [&>span]:hover:text-foreground text-muted-foreground flex cursor-pointer justify-between py-3",
+                          index == 0 && "pt-0",
+                          index != articles?.[year]?.length - 1 &&
+                            "border-border hover:border-muted-foreground/50 border-b",
+                        )}
+                      >
+                        <h2>{title}</h2>
+                        <span class="text-fmuted-foreground">
+                          {format(date, "do MMM")}
+                        </span>
+                      </div>
+                    </a>
+                  </>
+                ),
+              )}
+            </div>
+          </div>
+        ))
+      }
     </aside>
   </Container>
 </Layout>
