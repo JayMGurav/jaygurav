@@ -3,29 +3,29 @@ import { type CollectionEntry, getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
 import ArrowCard from "@components/ArrowCard.astro";
-import { BLOG } from "@consts";
+import { ARTICLES } from "@consts";
 
-const data = (await getCollection("blog"))
+const data = (await getCollection("articles"))
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 type Acc = {
-  [year: string]: CollectionEntry<"blog">[];
+  [year: string]: CollectionEntry<"articles">[];
 };
 
-const posts = data.reduce((acc: Acc, post) => {
-  const year = post.data.date.getFullYear().toString();
+const articles = data.reduce((acc: Acc, article) => {
+  const year = article.data.date.getFullYear().toString();
   if (!acc[year]) {
     acc[year] = [];
   }
-  acc[year].push(post);
+  acc[year].push(article);
   return acc;
 }, {});
 
-const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
+const years = Object.keys(articles).sort((a, b) => parseInt(b) - parseInt(a));
 ---
 
-<Layout title={BLOG.TITLE} description={BLOG.DESCRIPTION}>
+<Layout title={ARTICLES.TITLE} description={ARTICLES.DESCRIPTION}>
   <Container>
     <aside data-pagefind-ignore>
       <div class="space-y-10">
@@ -38,9 +38,9 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
                 </div>
                 <div>
                   <ul class="not-prose flex flex-col gap-4">
-                    {posts[year].map((post) => (
+                    {articles[year].map((article) => (
                       <li>
-                        <ArrowCard entry={post} />
+                        <ArrowCard entry={article} />
                       </li>
                     ))}
                   </ul>

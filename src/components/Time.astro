@@ -1,0 +1,37 @@
+---
+const year = new Date().getFullYear();
+const time = new Date().toLocaleTimeString("en-US", {
+    timeZone: "Asia/Calcutta",
+});
+
+const { displayYear = true } = Astro.props;
+---
+
+<div class="w-max text-xs text-foreground-3 flex gap-2 items-center" data-pagefind-ignore="all">
+    <span id="dispay_time">
+        {time}
+    </span>
+    {
+        displayYear && (
+            <>
+                |<span>{year} AD</span>
+            </>
+        )
+    }
+</div>
+
+<script>
+    const timeElement = document.getElementById("dispay_time");
+    if (timeElement) {
+        let time = new Date().toLocaleTimeString("en-US", {
+            timeZone: "Asia/Calcutta",
+        });
+
+        setInterval(() => {
+            time = new Date().toLocaleTimeString("en-US", {
+                timeZone: "Asia/Calcutta",
+            });
+            timeElement.innerHTML = time;
+        }, 1000);
+    }
+</script>
