@@ -2,15 +2,14 @@
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
 import { SITE, ABOUT, SOCIALS } from "@consts";
-import Nav from "@components/Nav.astro";
 import Link from "@components/Link.astro";
-// import Signature from "@components/Signature.astro";
+import Signature from "@components/Signature.astro";
 ---
 
 <Layout title={ABOUT.TITLE} description={ABOUT.DESCRIPTION}>
     <Container backLink="/" backLinkText="Back to Index">
         <div class="py-3" data-pagefind-ignore="all">
-            <article class="text-foreground/80 space-y-6">
+            <article class="text-foreground/80 animate space-y-6">
                 <h1 class="mb-0 text-base font-semibold">Jay Gurav</h1>
                 <span class="text-muted-foreground mt-0"
                     >Building software. Creating magic. Humming a tune.</span
@@ -46,8 +45,13 @@ import Link from "@components/Link.astro";
                     mind. I also do enjoy deep beats—songs that hook me up in
                     first 10 seconds and help me focus.
                 </p>
+                <div class="my-10 text-right">
+                    <Signature />
+                </div>
+            </article>
+            <div class="mt-20">
                 <p>I too, am social. Connect.</p>
-                <ul class="not-prose text-foreground flex flex-wrap gap-2">
+                <ul class="not-prose text-foreground mt-4 flex flex-wrap gap-2">
                     {
                         SOCIALS.map((SOCIAL) => (
                             <li class="flex gap-x-2 text-nowrap">
@@ -71,13 +75,6 @@ import Link from "@components/Link.astro";
                         </Link>
                     </li>
                 </ul>
-            </article>
-            <div class="mt-14">
-                <Nav />
-            </div>
-
-            <div class="my-10 mt-32 text-right">
-                <!-- <Signature /> -->
             </div>
         </div>
     </Container>
