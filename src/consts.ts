@@ -12,6 +12,11 @@ export const HOME: Metadata = {
   DESCRIPTION: "Astro Micro is an accessible theme for Astro.",
 };
 
+export const ABOUT: Metadata = {
+  TITLE: "ABOUT",
+  DESCRIPTION: "A little about me and my life.",
+};
+
 export const ARTICLES: Metadata = {
   TITLE: "Articles",
   DESCRIPTION: "Quater mile into my learnings and experiences.",

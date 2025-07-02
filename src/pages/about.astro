@@ -1,49 +1,84 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
-import { HOME } from "@consts";
-import croppedImage from "@assets/croppedImage.png";
-import { Image } from "astro:assets";
+import { SITE, ABOUT, SOCIALS } from "@consts";
+import Nav from "@components/Nav.astro";
+import Link from "@components/Link.astro";
+// import Signature from "@components/Signature.astro";
 ---
 
-<Layout title={HOME.TITLE} description={HOME.DESCRIPTION}>
+<Layout title={ABOUT.TITLE} description={ABOUT.DESCRIPTION}>
     <Container backLink="/" backLinkText="Back to Index">
-        <h1>Jay Gurav</h1>
-        <span>Building software. Creating magic. Humming a tune.</span>
+        <div class="py-3" data-pagefind-ignore="all">
+            <article class="text-foreground/80 space-y-6">
+                <h1 class="mb-0 text-base font-semibold">Jay Gurav</h1>
+                <span class="text-muted-foreground mt-0"
+                    >Building software. Creating magic. Humming a tune.</span
+                >
 
-        <p>
-            You can do anything. That’s what I believe and live by. Passionate
-            about software and the endless possibilities of technology, I'm
-            currently based in India, working as a Software Engineer for
-            Decathlon UK.
-        </p>
+                <p>
+                    <em class="text-foreground">You can do anything.</em> - that’s
+                    what I believe and live by. Driven by this mindset and a deep
+                    curiosity for the endless potential of technology, I’m currently
+                    based in India, exploring, creating, and being unapologetically
+                    me.
+                </p>
+                <p>
+                    Navigating life on my own terms, seeking new experiences and
+                    opportunities. I’m constantly developing my skills through
+                    doing. Mindful that everything around me represents
+                    someone's dedicated effort and is their own piece of art, I
+                    aim to contribute my best work to the world.
+                </p>
+                <p>
+                    As a kid, I got myself a small handbook and dreamed of
+                    drawing the whole world in it, capturing everything I
+                    observed, saw, and learned. This old dream forms the basis
+                    for this site. For me, details are not just details; they
+                    are the essence of an experience, communicated by small,
+                    intimate observation.
+                </p>
+                <p>
+                    I find programming truly fascinating — the idea that a few
+                    lines of code can shape the world we live in never ceases to
+                    amaze me. Am bad at photography, so I play with it,
+                    strangely capturing a time while humming music from my back
+                    mind. I also do enjoy deep beats—songs that hook me up in
+                    first 10 seconds and help me focus.
+                </p>
+                <p>I too, am social. Connect.</p>
+                <ul class="not-prose text-foreground flex flex-wrap gap-2">
+                    {
+                        SOCIALS.map((SOCIAL) => (
+                            <li class="flex gap-x-2 text-nowrap">
+                                <Link
+                                    href={SOCIAL.HREF}
+                                    external
+                                    aria-label={`${SITE.TITLE} on ${SOCIAL.NAME}`}
+                                >
+                                    {SOCIAL.NAME}
+                                </Link>
+                                {"/"}
+                            </li>
+                        ))
+                    }
+                    <li class="line-clamp-1">
+                        <Link
+                            href={`mailto:${SITE.EMAIL}`}
+                            aria-label={`Email ${SITE.TITLE}`}
+                        >
+                            {SITE.EMAIL}
+                        </Link>
+                    </li>
+                </ul>
+            </article>
+            <div class="mt-14">
+                <Nav />
+            </div>
 
-        <p>
-            Navigating life on my own terms, seeking new experiences and
-            opportunities. I’m constantly developing my skills through doing.
-            Mindful that everything around me represents someone's dedicated
-            effort and is their own piece of art, I aim to contribute my best
-            work to the world.
-        </p>
-
-        <p>
-            As a kid, I got myself a small handbook and dreamed of drawing the
-            whole world in it, capturing everything I observed, saw, and
-            learned. This old dream forms the basis for this site. For me,
-            details are not just details; they are the essence of an experience,
-            communicated by small, intimate observation.
-        </p>
-
-        <p>
-            Am bad at photography, so I play with it, strangely capturing a time
-            while humming music from my back mind. Though my curated favorites
-            include classic rock, pop, country, and Indian classical music, I
-            also do enjoy deep beats—songs that hook me up in first 10 seconds
-            and help me focus.
-        </p>
-
-        <p>I too, am social.</p>
-
-        Connect. Reach out to me at @jaymgurav or jaymgurav@gmail.com
+            <div class="my-10 mt-32 text-right">
+                <!-- <Signature /> -->
+            </div>
+        </div>
     </Container>
 </Layout>
