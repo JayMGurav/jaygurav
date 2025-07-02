@@ -1,0 +1,28 @@
+[
+    {
+        "title": "Life beyond distributed transactions: an Apostate’s Opinion",
+        "author": "Pat Helland",
+        "status": "TO_READ"
+    },
+    {
+        "title": "The Purely Functional Software Deployment Model",
+        "author": "Eelco Dolstra",
+        "status": "TO_READ"
+    },
+    {
+        "title": "A Note on Distributed Computing",
+        "author": "Jim Waldo",
+        "status": "TO_READ",
+        "link": "https://scholar.harvard.edu/files/waldo/files/waldo-94.pdf"
+    },
+    {
+        "title": "The Role of Self-Concept in Consumer Behavior",
+        "author": "Marisa Toth",
+        "status": "TO_READ"
+    },
+    {
+        "title": "The Extended Mind",
+        "author": "Andy Clark and David Chalmers",
+        "status": "TO_READ"
+    }
+]

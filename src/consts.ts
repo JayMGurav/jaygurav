@@ -14,7 +14,17 @@ export const HOME: Metadata = {
 
 export const ARTICLES: Metadata = {
   TITLE: "Articles",
-  DESCRIPTION: "A collection of articles on topics I am passionate about.",
+  DESCRIPTION: "Quater mile into my learnings and experiences.",
+};
+
+export const BOOKS: Metadata = {
+  TITLE: "Bookshelf",
+  DESCRIPTION: "A collection of books I have read or plan to read.",
+};
+
+export const PAPERS: Metadata = {
+  TITLE: "Paperself",
+  DESCRIPTION: "I read a few papers every now and then, around various topics that interests me and here are some of them.",
 };
 
 export const PROJECTS: Metadata = {

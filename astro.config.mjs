@@ -16,7 +16,4 @@ export default defineConfig({
       theme: "css-variables",
     },
   },
-  experimental: {
-    viewTransitions: true,
-  },
 });

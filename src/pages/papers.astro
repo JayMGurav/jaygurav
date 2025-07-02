@@ -1,0 +1,54 @@
+---
+import { getCollection } from "astro:content";
+
+import Library from "@icons/Library.astro";
+import BookCheck from "@icons/BookCheck.astro";
+import BookOpenText from "@icons/BookOpenText.astro";
+import Layout from "@layouts/Layout.astro";
+import Container from "@components/Container.astro";
+import { PAPERS } from "@consts";
+
+const allPapers = (
+    await getCollection("readingList", ({ id }) => id == "papers")
+)?.[0].data;
+
+const TO_READ = "TO_READ";
+const READING = "READING";
+const READ = "READ";
+---
+
+<Layout title={PAPERS.TITLE} description={PAPERS.DESCRIPTION}>
+    <Container backLink="/" backLinkText="Back to Index">
+        <div class="my-4 my-10">
+            <h1>{PAPERS.TITLE}</h1>
+            <span class="text-muted-foreground">{PAPERS.DESCRIPTION}</span>
+        </div>
+        <ul class="text-foreground animate my-6">
+            {
+                allPapers?.map(({ title, author, status }) => (
+                    <li
+                        class="border-border flex items-center border-b py-3 text-left"
+                        data-pagefind-meta="title:Books"
+                        data-pagefind-id={title.replace(/\s+/g, "-")}
+                    >
+                        <span data-pagefind-ignore="all">
+                            {status == TO_READ && (
+                                <Library class="text-muted-foreground mr-3 h-4 w-4" />
+                            )}
+                            {status == READING && (
+                                <BookOpenText class="text-muted-foreground mr-3 h-4 w-4" />
+                            )}
+                            {status == READ && (
+                                <BookCheck class="text-muted-foreground mr-3 h-4 w-4" />
+                            )}
+                        </span>
+                        <span>{title}</span>
+                        <span class="text-foreground/70 ml-auto items-end text-right">
+                            {author}
+                        </span>
+                    </li>
+                ))
+            }
+        </ul>
+    </Container>
+</Layout>
