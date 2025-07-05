@@ -8,7 +8,10 @@ import { Image } from "astro:assets";
 import croppedImage from "@assets/croppedImage.png";
 ---
 
-<header transition:persist>
+<header
+  transition:persist
+  class="from-background via-background to-background md:via-background/75 md:to-background/25 fixed top-0 right-0 left-0 z-50 bg-gradient-to-b py-6 saturate-200"
+>
   <div class="flex flex-wrap justify-between gap-y-2 px-3 md:px-6">
     <Link href="/" underline={false}>
       <div class="flex items-center gap-2">
@@ -33,7 +36,7 @@ import croppedImage from "@assets/croppedImage.png";
         </div>
       </div>
     </Link>
-    <div class="flex items-center gap-2">
+    <div class="bg-background flex items-center gap-2 p-2">
       <Nav />
       <button
         id="magnifying-glass"

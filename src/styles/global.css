@@ -96,12 +96,6 @@
     @apply text-foreground dark:text-foreground;
   }
 
-  header {
-    @apply fixed left-0 right-0 top-0 z-50 py-6;
-    @apply bg-gradient-to-b from-background via-background/75 to-background/25;
-    @apply saturate-200;
-  }
-
   main {
     @apply flex-1 py-32;
   }
