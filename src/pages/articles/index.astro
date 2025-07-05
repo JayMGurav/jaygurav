@@ -40,6 +40,10 @@ const years = Object.keys(articles).sort((a, b) => parseInt(b) - parseInt(a));
 
 <Layout title={ARTICLES.TITLE} description={ARTICLES.DESCRIPTION}>
   <Container backLink="/" backLinkText="Back to Index">
+    <div class="my-4 my-10">
+      <h1>{ARTICLES.TITLE}</h1>
+      <span class="text-muted-foreground">{ARTICLES.DESCRIPTION}</span>
+    </div>
     <aside data-pagefind-ignore class="my-10">
       {
         years?.map((year) => (
