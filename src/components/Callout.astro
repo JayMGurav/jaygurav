@@ -1,18 +1,26 @@
 ---
-interface Props {
-  type?: "default" | "info" | "warning" | "error";
-}
-const { type = "default" } = Astro.props;
-let emoji = "💡";
-if (type === "info") {
-  emoji = "ℹ️";
-} else if (type === "warning") {
-  emoji = "⚠️";
-} else if (type === "error") {
-  emoji = "🚨";
-}
+import BookMark from "@icons/BookMark.astro";
+import Error from "@icons/Error.astro";
+import Info from "@icons/Info.astro";
+import PopCorn from "@icons/PopCorn.astro";
+import Warning from "@icons/Warning.astro";
 
-const baseClasses = "relative my-4 flex rounded border p-3";
+interface Props {
+  type?: "default" | "info" | "warning" | "error" | "tldr";
+  title?: string;
+}
+const { type = "default", title } = Astro.props;
+
+const icons = {
+  default: PopCorn,
+  info: Info,
+  warning: Warning,
+  error: Error,
+  tldr: BookMark,
+};
+const CalloutIcon = icons[type] || PopCorn; // Default to lightbulb emoji if type is not recognized
+
+const baseClasses = "relative my-4 flex flex-col rounded border p-3";
 const typeClasses = {
   default:
     "border-orange-800 bg-orange-100 text-orange-950 dark:border-orange-200/20 dark:bg-orange-950/20 dark:text-orange-200",
@@ -21,10 +29,16 @@ const typeClasses = {
     "border-yellow-800 bg-yellow-100 text-yellow-950 dark:border-yellow-200/20 dark:bg-yellow-950/20 dark:text-yellow-200",
   error:
     "border-red-800 bg-red-100 text-red-950 dark:border-red-200/20 dark:bg-red-950/20 dark:text-red-200",
+  tldr: "border bg-card text-card-foreground text-muted-foreground",
 };
 ---
 
 <div class:list={["not-prose", baseClasses, typeClasses[type]]}>
-  <span class="pointer-events-none pr-3 text-xl select-none">{emoji}</span>
+  <p class="mb-2">
+    <span class="pointer-events-none pr-0 text-xl select-none"
+      ><CalloutIcon class="inline size-5" /></span
+    >
+    {title && <span class="font-semibold">{title}</span>}
+  </p>
   <slot />
 </div>

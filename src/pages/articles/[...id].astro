@@ -85,6 +85,13 @@ const { Content, headings } = await render(post);
     {headings.length > 0 && <TableOfContents headings={headings} />}
     <article class="animate">
       <Content />
+      <div class="mt-24 text-right">
+        <p>
+          -an article by <span class="font-signature ml-2 font-bold"
+            >Jay Gurav.</span
+          >
+        </p>
+      </div>
       <div class="mt-24">
         <PostNavigation prevPost={prevPost} nextPost={nextPost} />
       </div>
