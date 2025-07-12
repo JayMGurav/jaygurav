@@ -8,8 +8,9 @@ import Warning from "@icons/Warning.astro";
 interface Props {
   type?: "default" | "info" | "warning" | "error" | "tldr";
   title?: string;
+  icon?: boolean;
 }
-const { type = "default", title } = Astro.props;
+const { type = "default", title, icon=true } = Astro.props;
 
 const icons = {
   default: PopCorn,
@@ -35,9 +36,8 @@ const typeClasses = {
 
 <div class:list={["not-prose", baseClasses, typeClasses[type]]}>
   <p class="mb-2">
-    <span class="pointer-events-none pr-0 text-xl select-none"
-      ><CalloutIcon class="inline size-5" /></span
-    >
+    {icon && <span class="pointer-events-none pr-0 text-xl select-none"
+      ><CalloutIcon class="inline size-5" /></span>}
     {title && <span class="font-semibold">{title}</span>}
   </p>
   <slot />
