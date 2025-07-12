@@ -9,6 +9,7 @@ import Image from "astro/components/Image.astro";
 import partyPopper from "@assets/partyPopper.avif";
 import { cn } from "@lib/utils";
 import Nav from "@components/Nav.astro";
+import Signature from "@components/Signature.astro";
 
 const articles = (await getCollection("articles"))
   .filter((post) => !post.data.draft)
@@ -32,18 +33,27 @@ const featuredArticles = articles.slice(0, 3);
       <div class="space-y-16">
         <section>
           <article class="space-y-4">
-            <span>
-              <p>
-                Hey there! I'm Jay Gurav, a Software Engineer at Decathlon UK.
-                I'm all about building software, creating magic, and embracing a
-                lifelong journey of learning. Here, you'll find my thoughts on
-                design, engineering, and whatever else sparks my curiosity,
-                along with personal experiments and insights.
-              </p>
-            </span>
+            <p>
+              Hey there, I'm Jay Gurav — and this is my blog, a.k.a. my online
+              notepad with delusions of grandeur.
+            </p>
+            <p>
+              Here, I share ideas, stories, and reflections from my journey
+              through work, life, and whatever rabbit hole I’ve recently fallen
+              into. From curious thoughts and half-baked experiments to personal
+              insights and unexpected discoveries, it’s all part of the mix.
+              Some posts might make you think; others might make you wonder,
+              <em>"Why did he even write this?" </em> —but either way, I’m glad you’re
+              here. Might as well scroll a bit, with a strong cup of coffee and a
+              healthy dose of curiosity.
+            </p>
+            <span>Read at your own risk.</span>
+            <!-- <p class="text-muted-foreground text-right text-sm">
+              <Signature />
+            </p> -->
           </article>
-          <Nav />
         </section>
+        <hr class="bg-card" />
 
         <section class="animate space-y-6">
           <div class="flex flex-wrap items-center justify-between gap-y-2">
