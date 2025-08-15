@@ -21,7 +21,7 @@ const icons = {
   tldr: BookMark,
   popcorn: PopCorn, // Fallback to popcorn icon if type is not recognized
 };
-const CalloutIcon = icons[type] || LightBulb; // Default to lightbulb emoji if type is not recognized
+const CalloutIcon = icons[type]; // Default to lightbulb emoji if type is not recognized
 
 const baseClasses = "relative my-4 flex flex-col rounded border p-3";
 const typeClasses = {

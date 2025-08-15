@@ -1,0 +1,254 @@
+---
+title: "Single Responsbility Principle"
+description: "Single Responsibility Principle (SRP) in software design — why each module should have one reason to change and one actor to serve. Improve clarity, maintainability, and adaptability in your code."
+date: "2025-08-10"
+tags: ["software concepts", "programming principles", "clean code", "java", "oop"]
+draft: false
+
+---
+
+import Callout from "@/components/Callout.astro";
+import Link from "@/components/Link.astro";
+
+---
+
+<Callout type="tldr" title="TL;DR:"> The Single Responsibility Principle (SRP) states that a module should be responsible to one, and only one, actor — an actor being a stakeholder or user group that may request changes to it. By giving each part of the system a single, well-defined responsibility, SRP improves clarity, cohesion, and maintainability while reducing complexity, avoiding unintended side effects, and producing cleaner, more adaptable software.</Callout>
+
+---
+
+
+Lately I’ve been thinking about how software development is just breaking big, messy problems into smaller, less-messy ones. Then stitching them back together until they kind of resemble a system that does what we need. It's just composition.
+
+While software development is that, We’re developers not exactly… innocent, we are actors of crime in this process of development. We are chaos wrapped in logic. We bring our quirks, our opinions, our “I’ll just do it this way” moments. And that chaos leaks into the code. Suddenly, a single file is juggling five different concerns because, well, it felt efficient or pleased our fingers at the time. We complicate things by mixing together code that many people care about in many different ways.
+
+
+SRP(the Single Responsibility Principle) really comes into focus when you start breaking(decomposing) a problem apart. And when I sat with it for a while, I realized it's less about functions or classes and more about actors. Who cares about this piece of code? Who's impacted when it changes?
+
+Ironically, being the actors of crime, we’ve even misinterpret the very principle we're trying to follow. We try to apply the rule—and end up misunderstanding it. There's something oddly poetic about that. Feels like a reflection of humanity as a whole.
+
+More questions than answers right now. Behold.
+
+## World Interpreted
+
+The term _Single Responsibility Principle_ itself was coined by Robert Martin—better known in software circles as “Uncle Bob”—and rooted in an older design idea: cohesion.
+
+Cohesion is about how well the parts of a module fit together. Uncle Bob didn’t invent it—he openly credits Tom DeMarco and Meilir Page-Jones—but he took it somewhere new. He tied cohesion to the forces that make a module change, and in his early definition boiled it down to:
+
+> A class should have only one reason to change.
+
+Here, responsibility became synonymous with reason for change:
+
+> Responsibility = Reason for Change
+
+Sounds clean, right? A module has one reason to change—good. Michael Feathers echoed the same in Working Effectively with Legacy Code, putting it as:
+
+
+> Every class should have a single responsibility: It should have a single purpose in the system, and there should be only one reason to change it.
+
+At first glance, this idea seems straightforward and obvious… until you actually try to define it. What exactly qualifies as a “reason”? Are we talking about technical changes? Business requirements? Design choices? All of them? The line blurs fast.
+
+To dig deeper into decomposing software, I read one of the works often linked to SRP: Parnas’s On the Criteria To Be Used in Decomposing Systems into Modules. Parnas compares two ways of breaking down systems:
+
+1. Flowchart-based decomposition: splitting things by the order they happen.
+2. Information-hiding decomposition: splitting things by design decisions most likely to change later.
+
+Parnas strongly advocates for the second approach — and for good reason arguing that a good system reflects the volatility of its design decisions, not the sequence of its operations. The “why” behind a module should be hidden, revealing only what others actually need. In short -put that choice into a module with an interface infront that hides the implementation details.
+
+
+Looping this back to SRP, and you see the connection:
+- If each module hides the implementation decision (Parnas), and
+- If each module equals one responsibility (Martin),
+
+…then modularity and responsibility are basically two ways of looking at the same thing.
+
+The problem? Take it too literally, and you end up with a Frankenstein system—every possible reason for change locked in its own tiny module. You get hundreds of little pieces, all technically “SRP compliant,” but the big picture feels more like shattered glass than elegant architecture. This is not gut-fully convincing of a good system architecture and is clearly undesirable.
+
+And that’s the tricky part: SRP is easy to explain, easy to nod along to, but maddeningly slippery to implement in the real world. Which is exactly why Uncle Bob eventually clarified his definition—shifting the focus just from the abstract “reasons to change” toward who is driving that change and actor's ownership.
+
+That’s where SRP gets a lot more interesting—and a lot more useful.
+
+## Theory, History, and a Shift in Perspective
+
+So, here’s the thing: the way SRP is often explained? It’s not the whole picture. Over time, it’s been oversimplified, misquoted, and trimmed down until it fits neatly into a conference slide—but that’s not where the real depth lives.
+
+Dig a little deeper (and yes, even Wikipedia has it's accurately explained), and you’ll see that Uncle Bob explain himself what he actually meant. In his own words:
+
+<Callout type="info" title="Robert Martin, 2014">
+When you write a software module, you want to make sure that when changes are requested, those changes can only originate from a single person, or rather, a single tightly coupled group of people representing a single narrowly defined business function.
+
+<br/>
+    <Link href="https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html" external>
+        - Read the full article here
+    </Link>
+</Callout>
+
+This is a subtle but important clarification that, It’s not just “a class should have one reason to change” in the abstract—it’s that reason should come from one clearly identifiable source of authority. One person. Or one tightly knit team. A single, well-defined business function.
+
+Why does that matter? Because software doesn’t just exist in code—it lives in organizations. If two different teams “own” a module, they’ll inevitably pull it in different directions. That’s how you get conflicting priorities, unclear ownership, and a maintenance nightmare.
+
+Now, pair this again with David Parnas’ technical angle:
+- If each module hides the implementation decision (Parnas), and
+- the decision, reason of change should have one clear owner(Uncle Bob).
+
+Put those together, and you get a richer picture:
+- Technical modularity keeps changes contained.
+- Organizational clarity keeps ownership aligned.
+
+In other words, SRP isn’t just about avoiding vague, multiple “reasons to change.” It’s about ensuring that when change happens, you know exactly who it’s coming from. That combination of design principle and organizational reality is what keeps systems healthy, maintainable, and, honestly, a lot less frustrating.
+
+Alright—enough theory. Let's take a look at a quick example
+
+## Fake Real-World Example
+
+```java
+public class Invoice {
+    private String customer;
+    private double amount;
+
+    public Invoice(String customer, double amount) {
+        this.customer = customer;
+        this.amount = amount;
+    }
+
+    public double calculateTotal() {
+        // Tax calculation logic
+        double tax = amount * 0.15;
+        return amount + tax;
+    }
+
+    public void saveToDatabase() {
+        // Save to DB
+        System.out.println("Saving invoice to database...");
+    }
+
+    public void printInvoice() {
+        // Print logic
+        System.out.println("Printing invoice for customer: " + customer);
+    }
+}
+```
+
+### What's wrong with this code?
+
+This class has **multiple reasons to change**, each coming from a **different group of people**:
+
+-  `calculateTotal()` → Might change when the **finance team** updates tax rules.
+-  `saveToDatabase()` → Might change when the **database team** or **devops** changes data persistence.
+-  `printInvoice()` → Might change when the **UX/design team** wants to reformat printed invoices.
+
+Each of these groups could request changes that would all modify this one class — that's exactly what SRP warns against.
+
+### Applying SRP: Split by Responsibility and ownership
+
+1. #### `Invoice` – Owned by **Finance/Accounting
+
+```java
+public class Invoice {
+    private String customer;
+    private double amount;
+
+    public Invoice(String customer, double amount) {
+        this.customer = customer;
+        this.amount = amount;
+    }
+
+    public String getCustomer() {
+        return customer;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public double calculateTotal() {
+        double tax = amount * 0.15;
+        return amount + tax;
+    }
+}
+```
+
+2. #### `InvoiceRepository` – Owned by **Database/Infrastructure team**
+
+
+```java
+public class InvoiceRepository {
+    public void save(Invoice invoice) {
+        // Save invoice to database
+        System.out.println("Saving invoice for customer: " + invoice.getCustomer());
+        // Simulate DB save logic...
+    }
+}
+```
+
+3. #### `InvoicePrinter` – Owned by **UX/Design or Docs team**
+
+```java
+
+public class InvoicePrinter {
+    public void print(Invoice invoice) {
+        // Format and print invoice
+        System.out.println("----- Invoice -----");
+        System.out.println("Customer: " + invoice.getCustomer());
+        System.out.println("Amount: $" + invoice.getAmount());
+        System.out.println("Total with Tax: $" + invoice.calculateTotal());
+        System.out.println("-------------------");
+    }
+}
+```
+
+4. #### Main class (Usage example)
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        Invoice invoice = new Invoice("Acme Corp", 1000.00);
+
+        // Business team uses core logic
+        double total = invoice.calculateTotal();
+
+        // Infrastructure team persists the invoice
+        InvoiceRepository repository = new InvoiceRepository();
+        repository.save(invoice);
+
+        // Presentation team handles invoice output
+        InvoicePrinter printer = new InvoicePrinter();
+        printer.print(invoice);
+    }
+}
+```
+
+
+### Summary of Responsibilities
+
+
+| Class               | Responsibility             | Owned by               |
+| ------------------- | -------------------------- | ---------------------- |
+| `Invoice`           | Business rules (tax, etc.) | Finance team           |
+| `InvoiceRepository` | Persistence (DB logic)     | Infrastructure/DB team |
+| `InvoicePrinter`    | Presentation (formatting)  | UX/Design/Docs team    |
+
+
+In this setup, each class has one responsibility and one clear owner.
+- If the finance team decides tax rules need tweaking, they update Invoice—and nothing else.
+- If the database schema changes, the infrastructure team touches only InvoiceRepository.
+- If the design team wants a prettier invoice layout, they go straight to InvoicePrinter.
+
+No stepping on each other’s toes. No “just one quick change” that accidentally breaks something unrelated.
+
+## Why It Delivers Better Code
+
+- One reason to change by one actor → Clear boundaries between modules.
+- Simpler maintenance → Changes happen in isolation, with fewer surprises.
+- Readable code → Each class has a tight, obvious purpose.
+- Better tests → Smaller, focused modules are easier to test (and trust).
+- Loose coupling → One change doesn’t ripple through the whole codebase.
+- Organizational alignment → Code ownership mirrors real-world team structures.
+
+## Final Thoughts
+
+SRP isn’t a one-and-done checklist item you tick during the initial design phase—it’s something to keep an eye on throughout the life of a project.
+
+If a module starts feeling heavy, juggling unrelated concerns, or attracting change requests from multiple teams, that’s your early warning sign: responsibilities are blurring. That’s the moment to refactor. The payoff? Clearer code, happier maintainers, and teams that can move independently without tripping over each other.
+
+
+I hope this article gave you a clearer understanding of the Single Responsibility Principle and its importance in software design. Let’s keep exploring good code together — and stay responsible.
