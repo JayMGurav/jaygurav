@@ -1,0 +1,102 @@
+---
+title: "FormatDateTime"
+description: "A small package to format date object by providing a template to parse and rendering it anytime, anywhere with any date object."
+date: "2024-03-26"
+# demoURL: "https://astro-nano-demo.vercel.app"
+repoURL: "https://github.com/JayMGurav/FormaDateTime"
+---
+
+**FormaDateTime** is a lightweight, high-performance JavaScript/TypeScript utility for formatting `Date` objects using customizable templates. Parse once, render repeatedly with any date—anytime, anywhere.
+
+---
+
+##  Features
+
+-  **Template-Based Formatting** — Define human-readable output formats using intuitive placeholders.
+-  **Single Parsing, Multiple Renders** — Templates are parsed once, enabling high performance across multiple render calls.
+-  **Flexible & Easy to Use** — Create different formatter instances for different template needs.
+-  Written in **TypeScript** with JavaScript support
+
+---
+
+## Supported Identifiers
+
+| Placeholder | Description                   | Example Output |
+|-------------|-------------------------------|----------------|
+| `MMMM`      | Full month name               | January        |
+| `MM`        | Short month name              | Jan            |
+| `Mo`        | Numeric month (zero-padded)   | 01             |
+| `YYYY`      | Full year                     | 2021           |
+| `YY`        | Short year                    | 21             |
+| `dddd`      | Full weekday name             | Monday         |
+| `DD`        | Day of month (zero-padded)    | 15             |
+| `Do`        | Ordinal day (`st`, `nd`, etc.)| 15th           |
+| `h`         | Hour in 12-hour format        | 06             |
+| `H`         | Hour in 24-hour format        | 18             |
+| `mm`        | Minutes (zero-padded)         | 05             |
+| `ss`        | Seconds (zero-padded)         | 05             |
+| `pa`        | AM/PM marker                  | AM or PM       |
+
+---
+
+```js
+import FormatDateTime from 'forma-date-time'; // adjust path or name as needed
+
+const formatter = new FormatDateTime(
+  "Published on: {Do} {MMMM} {YYYY}",
+  {
+    padMonth: true,
+    padDays: true,
+    padHours: true,
+  }
+);
+
+console.log(formatter.render(new Date()));  
+// Output example: "Published on: 24th December 2012"
+
+```
+
+---
+
+## Options
+
+Customize padding behavior with the following boolean options (defaults shown):
+
+```js
+{
+  padMonth: true, // zero-pad month numbers (e.g., "01")
+  padDays: true,  // zero-pad day numbers (e.g., "05")
+  padHours: true, // zero-pad hour numbers (e.g., "06")
+}
+
+```
+
+---
+```js
+{
+  padMonth: true, // zero-pad month numbers (e.g., "01")
+  padDays: true,  // zero-pad day numbers (e.g., "05")
+  padHours: true, // zero-pad hour numbers (e.g., "06")
+}
+
+```
+
+---
+
+## Why Use FormaDateTime?
+
+- Performance: Templates are parsed a single time and reused for multiple date renders.
+- Clarity: Placeholders are easy to write and read.
+- Flexibility: Create multiple template instances for varied formatting scenarios.
+
+---
+
+## Contributing
+
+Contributions are welcome! Whether it’s improving documentation, adding features, or reporting issues—feel free to submit PRs or open issues.
+
+---
+
+## 🏛️ License
+
+MIT

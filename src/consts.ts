@@ -35,7 +35,7 @@ export const PAPERS: Metadata = {
 export const PROJECTS: Metadata = {
   TITLE: "Projects",
   DESCRIPTION:
-    "A collection of my projects with links to repositories and live demos.",
+    "A collection of my projects, experiments that I've played with.",
 };
 
 export const SOCIALS: Socials = [

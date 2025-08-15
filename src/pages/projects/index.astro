@@ -1,0 +1,31 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Container from "@components/Container.astro";
+import ArrowCard from "@components/ArrowCard.astro";
+import { PROJECTS } from "@consts";
+
+const projects = (await getCollection("projects"))
+  .filter((project) => !project.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Layout title={PROJECTS.TITLE} description={PROJECTS.DESCRIPTION}>
+  <Container backLink="/" backLinkText="Back to Index">
+    <div class="my-4 my-10">
+      <h1>{PROJECTS.TITLE}</h1>
+      <span class="text-muted-foreground">{PROJECTS.DESCRIPTION}</span>
+    </div>
+    <aside data-pagefind-ignore class="my-10">
+        <ul class="animate not-prose flex flex-col gap-3">
+          {
+            projects.map((project) => (
+              <li>
+                <ArrowCard entry={project} roundedBottom roundedTop/>
+              </li>
+            ))
+          }
+        </ul>
+    </aside>
+  </Container>
+</Layout>
