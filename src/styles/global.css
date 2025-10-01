@@ -146,12 +146,6 @@ pre {
   @apply border border-border py-5;
 }
 
-@layer utilities {
-  .cursor-image {
-    cursor: url('/specs.png'), auto;
-  }
-}
-
 
 :root {
   --astro-code-foreground: #fafafa;

@@ -1,0 +1,82 @@
+---
+import { getCollection, getEntryBySlug } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+
+const { slug = [] } = Astro.params as { slug?: string[] };
+const slugArr = Array.isArray(slug) ? slug : [slug];
+
+// Get all learning articles
+const allLearnings = await getCollection('learnings');
+
+// Find all unique folders and articles at the current level
+const currentPrefix = slugArr.length ? slugArr.join('/') + '/' : '';
+const entries = allLearnings
+  .filter(entry => entry.id.startsWith(currentPrefix))
+  .map(entry => {
+    const rest = entry.id.slice(currentPrefix.length);
+    const parts = rest.split('/');
+    return {
+      entry,
+      isDir: parts.length > 1,
+      name: parts[0],
+      fullId: entry.id,
+    };
+  });
+
+// Group by unique subfolders and articles
+const folders = Array.from(new Set(entries.filter(e => e.isDir).map(e => e.name)));
+const articles = entries.filter(e => !e.isDir && e.name);
+
+// If the slug matches a file exactly, render it
+const article = allLearnings.find(e => e.id === slugArr.join('/'));
+
+export async function getStaticPaths() {
+  const allLearnings = await getCollection('learnings');
+  // Collect all unique folder and file paths
+  const paths = new Set<string>();
+  for (const entry of allLearnings) {
+    // Add the article path
+    paths.add(entry.id);
+    // Add all parent folder paths
+    const parts = entry.id.split('/');
+    for (let i = 1; i < parts.length; i++) {
+      paths.add(parts.slice(0, i).join('/'));
+    }
+  }
+  return Array.from(paths).map((p) => ({ params: { slug: p ? p.split('/') : [] } }));
+}
+
+---
+<Layout title="Learnings" description="Browse learning resources by category.">
+  <h1>Learnings</h1>
+  {article ? (
+    <article>
+      <h2>{article.data?.title ?? article.id.split('/').pop()}</h2>
+      <article set:html={article.body} />
+    </article>
+  ) : (
+    <>
+      {folders.length > 0 && (
+        <>
+          <h2>Categories</h2>
+          <ul>
+            {folders.map(folder => (
+              <li><a href={Astro.url.pathname.replace(/\/$/, '') + '/' + folder}>{folder}/</a></li>
+            ))}
+          </ul>
+        </>
+      )}
+      {articles.length > 0 && (
+        <>
+          <h2>Articles</h2>
+          <ul>
+            {articles.map(({ entry }) => (
+              <li><a href={Astro.url.pathname.replace(/\/$/, '') + '/' + entry.id.slice(currentPrefix.length)}>{entry.data?.title ?? entry.id.split('/').pop()}</a></li>
+            ))}
+          </ul>
+        </>
+      )}
+      {folders.length === 0 && articles.length === 0 && <p>No content found.</p>}
+    </>
+  )}
+</Layout>

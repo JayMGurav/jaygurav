@@ -14,6 +14,17 @@ const articles = defineCollection({
   }),
 });
 
+const learnings = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: "./src/content/learnings" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    date: z.coerce.date(),
+    draft: z.boolean().optional(),
+    tags: z.array(z.string()).optional(),
+  }),
+});
+
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: "./src/content/projects" }),
   schema: z.object({
@@ -40,4 +51,9 @@ const readingListCollection = defineCollection({
   ),
 });
 
-export const collections = { articles, projects, readingList: readingListCollection };
+export const collections = { 
+  articles, 
+  projects, 
+  readingList: readingListCollection, 
+  learnings 
+};

@@ -20,12 +20,12 @@ const featuredArticles = articles.slice(0, 3);
 <Layout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
     <aside data-pagefind-ignore>
-      <h1 class="font-mono text-xl font-semibold">
+      <h1 class="font-medium font-mono text-xl">
         Welcome<Image
           src={partyPopper}
           alt="Hero"
           width={28}
-          class="-mt-2 ml-1 inline grayscale"
+          class="-mt-2 ml-2 inline grayscale"
         />
       </h1>
       <div class="space-y-16">
@@ -55,7 +55,7 @@ const featuredArticles = articles.slice(0, 3);
 
         <section class="animate space-y-6">
           <div class="flex flex-wrap items-center justify-between gap-y-2">
-            <h2 class="font-semibold text-black dark:text-white">
+            <h2 class="font-medium font-mono">
               Featured articles
             </h2>
           </div>
@@ -78,7 +78,7 @@ const featuredArticles = articles.slice(0, 3);
 
         <section class="animate space-y-6">
           <div class="flex flex-wrap items-center justify-between gap-y-2">
-            <h2 class="font-semibold text-black dark:text-white">
+            <h2 class="font-medium font-mono ">
               Recent articles
             </h2>
             <Link href="/articles"> See all articles </Link>
