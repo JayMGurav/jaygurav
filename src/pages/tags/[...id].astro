@@ -35,7 +35,15 @@ const sortedPosts = posts.sort(
         Posts tagged with "{id}"
       </h1>
       <ul class="animate flex flex-col gap-4">
-        {sortedPosts.map((post) => <ArrowCard entry={post} />)}
+        {
+          sortedPosts.map((post) => (
+            <ArrowCard
+              path={`/${post.collection}/${post.id}`}
+              title={post.data.title}
+              description={post.data.description}
+            />
+          ))
+        }
       </ul>
     </div>
   </Container>

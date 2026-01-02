@@ -17,15 +17,21 @@ const projects = (await getCollection("projects"))
       <span class="text-muted-foreground">{PROJECTS.DESCRIPTION}</span>
     </div>
     <aside data-pagefind-ignore class="my-10">
-        <ul class="animate not-prose flex flex-col gap-3">
-          {
-            projects.map((project) => (
-              <li>
-                <ArrowCard entry={project} roundedBottom roundedTop/>
-              </li>
-            ))
-          }
-        </ul>
+      <ul class="animate not-prose flex flex-col gap-3">
+        {
+          projects.map((project) => (
+            <li>
+              <ArrowCard
+                path={`/${project.collection}/${project.id}`}
+                title={project.data.title}
+                description={project.data.description}
+                roundedBottom
+                roundedTop
+              />
+            </li>
+          ))
+        }
+      </ul>
     </aside>
   </Container>
 </Layout>

@@ -19,3 +19,11 @@ export function readingTime(html: string) {
   const readingTimeMinutes = (wordCount / 200 + 1).toFixed();
   return `${readingTimeMinutes} min read`;
 }
+
+
+export const formatTitle = (str: string): string => {
+  return str
+    .replace(/[-_]/g, ' ') // 1. Clean separators first
+    .toLowerCase()         // 2. Normalize to lowercase
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // 3. Capitalize first letter of every word
+};

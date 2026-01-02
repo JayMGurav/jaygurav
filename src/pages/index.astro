@@ -20,7 +20,7 @@ const featuredArticles = articles.slice(0, 3);
 <Layout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
     <aside data-pagefind-ignore>
-      <h1 class="font-medium font-mono text-xl">
+      <h1 class="font-mono text-xl font-medium">
         Welcome<Image
           src={partyPopper}
           alt="Hero"
@@ -55,16 +55,16 @@ const featuredArticles = articles.slice(0, 3);
 
         <section class="animate space-y-6">
           <div class="flex flex-wrap items-center justify-between gap-y-2">
-            <h2 class="font-medium font-mono">
-              Featured articles
-            </h2>
+            <h2 class="font-mono font-medium">Featured articles</h2>
           </div>
           <ul class="not-prose flex flex-col gap-1">
             {
               featuredArticles.map((article, i) => (
                 <li>
                   <ArrowCard
-                    entry={article}
+                    path={`/${article.collection}/${article.id}`}
+                    title={article.data.title}
+                    description={article.data.description}
                     roundedBottom={i === featuredArticles.length - 1}
                     roundedTop={i === 0}
                   />
@@ -78,9 +78,7 @@ const featuredArticles = articles.slice(0, 3);
 
         <section class="animate space-y-6">
           <div class="flex flex-wrap items-center justify-between gap-y-2">
-            <h2 class="font-medium font-mono ">
-              Recent articles
-            </h2>
+            <h2 class="font-mono font-medium">Recent articles</h2>
             <Link href="/articles"> See all articles </Link>
           </div>
           <ul class="not-prose flex flex-col gap-1">

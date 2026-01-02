@@ -22,6 +22,7 @@ const learnings = defineCollection({
     date: z.coerce.date(),
     draft: z.boolean().optional(),
     tags: z.array(z.string()).optional(),
+    order: z.number().optional(),
   }),
 });
 
@@ -51,9 +52,9 @@ const readingListCollection = defineCollection({
   ),
 });
 
-export const collections = { 
-  articles, 
-  projects, 
-  readingList: readingListCollection, 
-  learnings 
+export const collections = {
+  articles,
+  projects,
+  readingList: readingListCollection,
+  learnings
 };

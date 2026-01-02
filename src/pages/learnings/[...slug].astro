@@ -1,82 +1,248 @@
 ---
-import { getCollection, getEntryBySlug } from 'astro:content';
-import Layout from '@/layouts/Layout.astro';
+import { getCollection, render } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Container from "@/components/Container.astro";
 
-const { slug = [] } = Astro.params as { slug?: string[] };
-const slugArr = Array.isArray(slug) ? slug : [slug];
-
-// Get all learning articles
-const allLearnings = await getCollection('learnings');
-
-// Find all unique folders and articles at the current level
-const currentPrefix = slugArr.length ? slugArr.join('/') + '/' : '';
-const entries = allLearnings
-  .filter(entry => entry.id.startsWith(currentPrefix))
-  .map(entry => {
-    const rest = entry.id.slice(currentPrefix.length);
-    const parts = rest.split('/');
-    return {
-      entry,
-      isDir: parts.length > 1,
-      name: parts[0],
-      fullId: entry.id,
-    };
-  });
-
-// Group by unique subfolders and articles
-const folders = Array.from(new Set(entries.filter(e => e.isDir).map(e => e.name)));
-const articles = entries.filter(e => !e.isDir && e.name);
-
-// If the slug matches a file exactly, render it
-const article = allLearnings.find(e => e.id === slugArr.join('/'));
+import SubjectAccordion from "@/components/SubjectAccordion.astro";
+import ArrowCard from "@components/ArrowCard.astro";
+import { formatTitle } from "@lib/utils";
 
 export async function getStaticPaths() {
-  const allLearnings = await getCollection('learnings');
-  // Collect all unique folder and file paths
+  const allLearnings = await getCollection("learnings");
   const paths = new Set<string>();
+
+  // Add root path
+  paths.add("");
+
   for (const entry of allLearnings) {
-    // Add the article path
-    paths.add(entry.id);
-    // Add all parent folder paths
-    const parts = entry.id.split('/');
-    for (let i = 1; i < parts.length; i++) {
-      paths.add(parts.slice(0, i).join('/'));
+    // entry.id is like "LLD/OOP/singleton.md"
+    const cleanId = entry.id.replace(/\.[^/.]+$/, ""); // Remove extension
+    const parts = cleanId.split("/");
+
+    for (let i = 1; i <= parts.length; i++) {
+      paths.add(parts.slice(0, i).join("/").toLowerCase());
     }
   }
-  return Array.from(paths).map((p) => ({ params: { slug: p ? p.split('/') : [] } }));
+
+  return Array.from(paths).map((p) => ({
+    params: { slug: p || undefined },
+  }));
 }
 
+const { slug } = Astro.params;
+const allLearnings = await getCollection("learnings");
+
+// Helper to clean IDs
+const cleanId = (id: string) => id.replace(/\.[^/.]+$/, "");
+
+// Determine current level
+const currentPath = (slug || "").toLowerCase();
+const currentParts = currentPath ? currentPath.split("/") : [];
+const depth = currentParts.length;
+
+// Find if this is a specific article (case-insensitive check)
+const article = allLearnings.find(
+  (e) => cleanId(e.id).toLowerCase() === currentPath,
+);
+
+// If not an article, find children
+let children: {
+  name: string;
+  type: "file" | "dir";
+  order?: number;
+  title?: string;
+}[] = [];
+
+if (!article) {
+  const directChildren = new Map<
+    string,
+    { type: "file" | "dir"; order?: number; title?: string }
+  >();
+
+  allLearnings.forEach((entry) => {
+    const cId = cleanId(entry.id);
+    const cIdLower = cId.toLowerCase();
+
+    // Check if this entry belongs to the current path (case-insensitive)
+    if (cIdLower.startsWith(currentPath ? currentPath + "/" : "")) {
+      // Get the relative path segment maintaining original casing for display if needed,
+      // but we need to match against the lowercased currentPath
+
+      // We need the part of the ID that comes after the match
+      // If currentPath is "", we take the whole ID
+      // If currentPath is "lld", we look for "LLD/..."
+
+      // Let's find the correct case-sensitive prefix length to slice
+      // Since we matched case-insensitively, we can just find where the split happens
+
+      // Actually, easier approach: split the original ID and check segments
+      const parts = cId.split("/");
+
+      // Verify matches up to current depth
+      const matchesPath = currentParts.every(
+        (part, index) => parts[index]?.toLowerCase() === part,
+      );
+
+      if (matchesPath) {
+        // The child component we are looking for is at 'depth' index
+        if (parts.length > depth) {
+          const name = parts[depth]; // Original case name
+          const nameLower = name.toLowerCase();
+          const isDir = parts.length > depth + 1;
+
+          if (!directChildren.has(nameLower)) {
+            let order = 999;
+            let title = name;
+
+            if (!isDir) {
+              // It's a file at this level
+              if (entry.data.order !== undefined) order = entry.data.order;
+              if (entry.data.title) title = entry.data.title;
+            }
+
+            directChildren.set(nameLower, {
+              type: isDir ? "dir" : "file",
+              order,
+              title, // Keep original title/name
+            });
+          } else if (!isDir) {
+            const existing = directChildren.get(nameLower)!;
+            if (entry.data.order !== undefined)
+              existing.order = entry.data.order;
+            if (entry.data.title) existing.title = entry.data.title;
+          }
+        }
+      }
+    }
+  });
+
+  children = Array.from(directChildren.entries())
+    .map(([lowerName, data]) => ({
+      name: lowerName, // Use lower case name for links
+      ...data,
+    }))
+    .sort(
+      (a, b) =>
+        (a.order ?? 999) - (b.order ?? 999) || a.title!.localeCompare(b.title!),
+    );
+}
+
+// Prepare data for Root view (Accordion)
+let subjects: { title: string; chapters: { title: string; href: string }[] }[] =
+  [];
+
+if (depth === 0 && !article) {
+  const subjectMap = new Map<string, Set<string>>();
+
+  allLearnings.forEach((entry) => {
+    const cId = cleanId(entry.id);
+    const parts = cId.split("/");
+    if (parts.length >= 2) {
+      const subject = parts[0];
+      const chapter = parts[1];
+
+      if (!subjectMap.has(subject)) {
+        subjectMap.set(subject, new Set());
+      }
+      subjectMap.get(subject)!.add(chapter);
+    }
+  });
+
+  subjects = Array.from(subjectMap.entries())
+    .map(([subject, chaptersSet]) => ({
+      title: subject,
+      chapters: Array.from(chaptersSet)
+        .map((chapter) => ({
+          title: chapter,
+          href: `/learnings/${subject.toLowerCase()}/${chapter.toLowerCase()}`,
+        }))
+        .sort((a, b) => a.title.localeCompare(b.title)),
+    }))
+    .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+const { Content } = article ? await render(article) : { Content: null };
+
+// Breadcrumbs
+// Reconstruct breadcrumbs using current parts
+const breadcrumbs = [
+  { name: "Learnings", href: "/learnings" },
+  ...currentParts.map((part, i) => ({
+    name: formatTitle(part), // could try to find pretty name, but slug part is okay
+    href: "/learnings/" + currentParts.slice(0, i + 1).join("/"),
+  })),
+];
 ---
-<Layout title="Learnings" description="Browse learning resources by category.">
-  <h1>Learnings</h1>
-  {article ? (
-    <article>
-      <h2>{article.data?.title ?? article.id.split('/').pop()}</h2>
-      <article set:html={article.body} />
-    </article>
-  ) : (
-    <>
-      {folders.length > 0 && (
-        <>
-          <h2>Categories</h2>
-          <ul>
-            {folders.map(folder => (
-              <li><a href={Astro.url.pathname.replace(/\/$/, '') + '/' + folder}>{folder}/</a></li>
-            ))}
-          </ul>
-        </>
-      )}
-      {articles.length > 0 && (
-        <>
-          <h2>Articles</h2>
-          <ul>
-            {articles.map(({ entry }) => (
-              <li><a href={Astro.url.pathname.replace(/\/$/, '') + '/' + entry.id.slice(currentPrefix.length)}>{entry.data?.title ?? entry.id.split('/').pop()}</a></li>
-            ))}
-          </ul>
-        </>
-      )}
-      {folders.length === 0 && articles.length === 0 && <p>No content found.</p>}
-    </>
-  )}
+
+<Layout
+  title={article?.data.title || "Learnings"}
+  description={article?.data.description || "Browse learnings"}
+>
+  <Container>
+    <div class="space-y-8">
+      {/* Breadcrumbs */}
+      <nav class="text-sm text-neutral-500">
+        <ol class="flex flex-wrap items-center gap-2">
+          {
+            breadcrumbs.map((crumb, index) => (
+              <li class="flex items-center gap-2">
+                {index > 0 && <span>/</span>}
+                <a
+                  href={crumb.href}
+                  class:list={[
+                    "transition-colors hover:text-black dark:hover:text-white",
+                    index === breadcrumbs.length - 1 && !article
+                      ? "font-medium text-black dark:text-white"
+                      : "",
+                  ]}
+                >
+                  {crumb.name}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      {
+        article ? (
+          <article class="prose dark:prose-invert max-w-none">
+            {Content && <Content />}
+          </article>
+        ) : (
+          <div class="space-y-6">
+            <h1 class="font-mono text-3xl font-bold">
+              {depth === 0 ? "" : depth === 1 ? "Chapters" : "Topics"}
+            </h1>
+
+            {depth === 0 ? (
+              <SubjectAccordion items={subjects} />
+            ) : (
+              <ul class="animate not-prose flex flex-col gap-3">
+                {children.map((child) => (
+                  <li>
+                    <ArrowCard
+                      path={`/learnings${currentPath ? "/" + currentPath : ""}/${child.name}`}
+                      title={formatTitle(child.title!)}
+                      description={""}
+                      roundedBottom
+                      roundedTop
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {children.length === 0 && depth !== 0 && (
+              <p class="text-neutral-500">No content found in this section.</p>
+            )}
+
+            {depth === 0 && subjects.length === 0 && (
+              <p class="text-neutral-500">No subjects found.</p>
+            )}
+          </div>
+        )
+      }
+    </div>
+  </Container>
 </Layout>
