@@ -1,0 +1,166 @@
+---
+title: "Performance optimisation React, Nextjs - Part 1"
+description: "Master React and Next.js performance with this guide to eliminating waterfalls, optimizing barrel files, and leveraging RSC streaming. Learn actionable patterns like Promise.all(), dynamic imports, and React.cache() to build faster, more efficient web applications."
+date: "2026-01-04"
+tags: ["react", "nextjs", "frontend"]
+draft: false
+
+---
+
+---
+## TL;DR:
+Most apps aren't slow because the code is bad; they're slow because the code is waiting. > We’re accidentally building digital traffic jams by awaiting tasks sequentially, shipping 1,500 icons to show one "Check" mark, and forcing users to stare at a blank screen while a single slow API call "cooks." This guide is my personal notepad on how to stop building monuments to technical debt and start building systems that actually breathe.
+
+The Quick Fixes:
+- Parallelize: If it doesn't depend on the previous line, don't make it wait.
+- Stream: Use `<Suspense>` to show the "shell" now and the data later.
+- Prune: Import only the module you need, not the whole library.
+- Lean Props: Stop sending 50 fields to a component that only needs one.
+
+---
+
+Performance optimization isn't about some secret "make-fast" button. It’s about being a better steward of your users' time. I’ve spent way too many late nights looking at Chrome DevTools, realizing that most of the "slow" apps were just suffering from a thousand tiny, unintentional blocks.
+
+Here is few of pointers that actually move the needle, stripped of the ivory-tower fluff.
+
+
+## 1. The "Waterfall" Problem: Stop Waiting for No Reason
+We’ve all done it. We await things one by one because it feels... safe? Sequential? It’s also the #1 way to make a fast network feel like a dial-up connection.
+
+If you have three 100ms fetches, doing them one by one takes 300ms. Doing them together takes 100ms. That’s 3x faster for two lines of code. We’re developers—we should at least try to be efficient.
+
+The Pattern: Promise.all() If Task B doesn't need the result of Task A, why is B sitting around waiting?
+
+```js
+// ❌ The "I'm busy" approach (300ms)
+const user = await fetchUser()      
+const posts = await fetchPosts()    
+const settings = await fetchSettings()
+
+// ✅ The "Intentional" approach (100ms)
+const [user, posts, settings] = await Promise.all([
+  fetchUser(), 
+  fetchPosts(), 
+  fetchSettings()
+])
+```
+The Reality Check: Handling Partial Dependencies Real life isn't always that clean. Sometimes Task C does need Task A, but Task B is independent. Orchestrating this with Promise.all manually is... slippery.
+
+That’s where better-all comes in. It treats your async tasks like a garden where things grow as soon as the soil is ready.
+
+```js
+import { all } from 'better-all'
+
+const { user, config, profile } = await all({
+  async user() { return fetchUser() },
+  async config() { return fetchConfig() },
+  async profile() {
+    // Starts as soon as 'user' completes. 
+    // It doesn't wait for 'config' to finish.
+    const u = await this.$.user 
+    return fetchProfile(u.id)
+  }
+})
+```
+
+Note: The magical this.$ object lets tasks talk to each other without you having to manually map out the graph. It’s "free" parallelism.
+
+## 2. Streaming: Don't Make the User Stare at a Blank Page
+
+Traditional SSR is a "wait-for-all" game. If one slow API call takes 2 seconds, the user sees a white screen for 2 seconds. That’s maddening.
+
+The Solution: Progressive Streaming With `<Suspense>`, we can send the "shell" of the page (the headers, the sidebar, the stuff that's ready) immediately and let the slow parts "stream" in as they finish.
+
+```jsx
+
+// Page.tsx
+export default function Page() {
+  return (
+    <main>
+      <Header /> {/* Ready in 10ms */}
+      
+      <Suspense fallback={<Skeleton />}>
+        <SlowPriceChart /> {/* Takes 1.5s, but doesn't block the Header */}
+      </Suspense>
+      
+      <Footer /> {/* Ready in 10ms */}
+    </main>
+  )
+}
+```
+Why it matters: The page feels interactive in 50ms. The user can start reading the header or navigating while the heavy data is still "cooking." It’s about perceived performance—making the app feel like it’s breathing, not frozen.
+
+## 3. The Barrel File: The Hidden "Tax" on Your Sanity
+
+This one is maddening because it’s so quiet. You import a single icon from a library, and suddenly your dev server takes three seconds to refresh.
+
+The Culprit: Barrel files. When you do `import { Check } from 'huge-library'`, the bundler often has to parse thousands of other exports just to find your one little icon.
+
+The Fix: Go direct.
+
+```js
+// ❌ Loading 1,583 icons to use one
+import { Check } from 'lucide-react'
+
+// ✅ Just the icon, please
+import Check from 'lucide-react/dist/esm/icons/check'
+```
+
+## 4. "Heavy" Components: Not Everyone Needs Everything
+
+Shipping 300KB of Monaco Editor to a user who’s just reading a blog post? That’s not minimalism; that’s a "monument" to poor planning.
+
+Real World Example: The Projections Tab
+
+The Fix: Only load heavy libraries when they click "See Projections."
+
+```js
+
+import dynamic from 'next/dynamic'
+
+const ThreeDWealthMap = dynamic(
+  () => import('@/components/visualizer'), 
+  { 
+    loading: () => <Skeleton height="400px" />,
+    ssr: false 
+  }
+)
+```
+
+
+## 5. Server-Side: RSC Boundaries and Serialization
+
+Every byte you pass from a Server Component to a Client Component has to be "serialized." If your user object has 50 fields but you only display the name, you’re sending dead weight across the wire.
+
+The Lean Prop Pattern:
+
+```
+// ❌ Passing the whole kitchen sink (5KB of JSON)
+<ClientProfile user={user} />
+
+// ✅ Just what we’re actually using (50 bytes)
+<ClientProfile name={user.name} />
+```
+
+
+## 6. Caching: Stop Asking the Same Question
+
+If five components on one page all need the current user, don't hit your database five times. It’s rude to the database and slow for the user.
+
+The "Pro" Member Check Use React.cache() to give your server a "short-term memory" within a single request.
+
+```js
+import { cache } from 'react'
+
+export const getMemberStatus = cache(async () => {
+  return await db.user.findFirst({ where: { id: CURRENT_USER_ID } })
+})
+```
+
+---
+
+At the end of the day, performance isn't just about shaving off milliseconds for the sake of a benchmark. It's about empathy. It's about realizing that on the other side of that "Loading..." spinner is a person trying to get something done.
+
+We often over-engineer the complex stuff while ignoring the simple blocks right in front of us. If we treat our code like a living system—pruning the dead weight and letting the data flow where it's actually needed—the speed follows naturally. We need to make sure it doesn't get too bloated to move.
+
+I'm already finding time to work on Part 2, stay tuned.
